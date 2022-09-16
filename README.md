@@ -47,7 +47,7 @@ module.exports = webpackConfig
 }
 ```
 
-在source.ttf的文件夹中创建source.txt文本文件，里面包含需要用到的字体。
+在source.ttf的文件夹中创建source.txt文本文件，里面包含需要压缩的文字。
 
 
 ## 选项
