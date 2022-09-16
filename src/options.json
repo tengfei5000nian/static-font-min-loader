@@ -1,0 +1,43 @@
+{
+  "additionalProperties": true,
+  "properties": {
+    "links": {
+      "description": "包含需要切割的文本的文件, 如果include、exclude存在，links失效",
+      "anyOf": [
+        {
+          "type": "array"
+        },
+        {
+          "type": "string"
+        }
+      ]
+    },
+    "include": {
+      "description": "包含的文件",
+      "anyOf": [
+        {
+          "instanceof": "RegExp"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "exclude": {
+      "description": "排除的文件",
+      "anyOf": [
+        {
+          "instanceof": "RegExp"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "filter": {
+      "description": "文本过滤",
+      "instanceof": "Function"
+    }
+  },
+  "type": "object"
+}
