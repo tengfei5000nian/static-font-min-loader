@@ -23,10 +23,13 @@ const webpackConfig = {
         rules: [
             {
                 test: /\.(otf|ttf|svg|svgs|eot|woff|woff2)(\?.*)?$/,
-                generator: {
-                    filename: '[name].[hash:8][ext]'
-                },
-                loader: 'static-font-min-loader'
+                type: 'javascript/auto',
+                loader: 'static-font-min-loader',
+                options: {
+                    fileLoaderOptions: {
+                        name: 'font/[name].[hash:8].[ext]'
+                    }
+                }
             }
         ]
     }
@@ -73,6 +76,12 @@ module.exports = webpackConfig
     // 文本过滤。
     //
     // type: function(text: string): string
-    filter: text => text
+    filter: text => text,
+
+    // file-loader的options。
+    // See https://github.com/webpack-contrib/file-loader
+    //
+    // type: object？
+    fileLoaderOptions: {}
 }
 ```

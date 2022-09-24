@@ -37,6 +37,17 @@
     "filter": {
       "description": "文本过滤",
       "instanceof": "Function"
+    },
+    "fileLoaderOptions": {
+      "description": "file-loader的options",
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object"
+        }
+      ]
     }
   },
   "type": "object"

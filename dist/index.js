@@ -10,13 +10,15 @@ var _path = _interopRequireDefault(require("path"));
 
 var _fontmin = _interopRequireDefault(require("fontmin"));
 
+var _fileLoader = _interopRequireDefault(require("file-loader"));
+
 var _schemaUtils = _interopRequireDefault(require("schema-utils"));
 
 var _options = _interopRequireDefault(require("./options.json"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const loaderName = 'font-loader';
+const loaderName = 'static-font-min-loader';
 
 function getExt() {
   const fromRes = this.resourcePath.match(/\.([\w\d]+)$/);
@@ -34,7 +36,8 @@ function getQuery() {
     links: this.resourcePath.replace(/\.([\w\d]+)$/, '.txt'),
     include: null,
     exclude: null,
-    filter: text => text
+    filter: text => text,
+    fileLoaderOptions: {}
   }, this.query);
 
   _schemaUtils.default.validate(_options.default, query);
@@ -178,15 +181,15 @@ async function _default(content, map, meta) {
     const [files] = await callbackAsync.call(fontmin, 'run');
     const file = files[files.length - 1];
     const data = file._contents;
-
-    const filename = _path.default.relative(this.rootContext, this.resource);
-
-    this._compilation.hooks.assetPath.tap(loaderName, (path, data, assetInfo) => {
-      if (data.filename !== filename) return;
-      return path.replace(new RegExp(`\\.${ext.from}$`), `.${ext.to}`);
+    const fileLoaderContext = Object.assign({}, this, {
+      query: this.query.fileLoaderOptions || {},
+      resource: this.resource.replace(`.${ext.from}`, `.${ext.to}`),
+      resourcePath: this.resourcePath.replace(`.${ext.from}`, `.${ext.to}`)
     });
 
-    callback(null, data, map, meta);
+    const exportPath = _fileLoader.default.call(fileLoaderContext, data, map, meta);
+
+    callback(null, exportPath, map, meta);
   } catch (err) {
     callback(err, '', map, meta);
   }

@@ -1,10 +1,11 @@
 import Path from 'path'
 import Fontmin from 'fontmin'
+import fileLoader from 'file-loader'
 import SchemaUtils from 'schema-utils'
 
 import options from './options.json'
 
-const loaderName = 'font-loader'
+const loaderName = 'static-font-min-loader'
 
 function getExt() {
   const fromRes = this.resourcePath.match(/\.([\w\d]+)$/)
@@ -24,7 +25,8 @@ function getQuery() {
     links: this.resourcePath.replace(/\.([\w\d]+)$/, '.txt'),
     include: null,
     exclude: null,
-    filter: text => text
+    filter: text => text,
+    fileLoaderOptions: {}
   }, this.query)
 
   SchemaUtils.validate(options, query)
@@ -168,14 +170,14 @@ export default async function (content, map, meta) {
     const file = files[files.length - 1]
     const data = file._contents
 
-    const filename = Path.relative(this.rootContext, this.resource)
+    const fileLoaderContext = Object.assign({}, this, {
+      query: this.query.fileLoaderOptions || {},
+      resource: this.resource.replace(`.${ext.from}`, `.${ext.to}`),
+      resourcePath: this.resourcePath.replace(`.${ext.from}`, `.${ext.to}`)
+    })
+    const exportPath = fileLoader.call(fileLoaderContext, data, map, meta)
 
-    this._compilation.hooks.assetPath.tap(loaderName, (path, data, assetInfo) => {
-      if (data.filename !== filename) return
-      return path.replace(new RegExp(`\\.${ext.from}$`), `.${ext.to}`)
-    });
-
-    callback(null, data, map, meta)
+    callback(null, exportPath, map, meta)
   } catch (err) {
     callback(err, '', map, meta)
   }
